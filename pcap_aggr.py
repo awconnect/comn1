@@ -15,6 +15,17 @@ class Node(object):
         #
         # write your code here
         #
+        if self.bytes < plen:
+            if self.left != None:
+                self.add(self.left, ip, plen)
+            else:
+                self.left = Node(ip, plen)
+        else:
+            if(self.right != None):
+                self.add(self.right, ip, plen)
+            else:
+                self.right = Node(ip, plen)
+        
     def data(self, data):
         if self.left:
             self.left.data(data)

@@ -35,19 +35,21 @@ class Flow(object):
                 #
                 ip_src = int(ip_address(ip.src))
                 ip_dst = int(ip_address(ip.dst))
-                lenip = ip.len - (4 * ip.ihl)
+                lenip = ip.len - 4 * ip.ihl
                 
                 is_tcp = ip.proto
 
-            if (TCP not in ether or is_tcp != 6):
+            if (TCP not in ip or is_tcp != 6):
                 continue
             tcp = ip[TCP]
             
             tcp_sport = tcp.sport
             tcp_dport = tcp.dport
+            if((ip_dst, ip_src, tcp_dport, tcp_sport) not in self.ft and (ip_src, ip_dst, tcp_sport, tcp_dport) not in self.ft ):
+                self.ft[(ip_src, ip_dst, tcp_sport, tcp_dport)] = lenip - 4 * tcp.dataofs
 
-            if ((ip_dst, ip_src, tcp_dport, tcp_sport) not in self.ft):
-                self.ft[(ip_src, ip_dst, tcp_sport, tcp_dport)] = lenip - (4 * tcp.dataofs)
+            elif ((ip_src, ip_dst, tcp_sport, tcp_dport) in self.ft and (ip_dst, ip_src, tcp_dport, tcp_sport) not in self.ft):
+                self.ft[(ip_src, ip_dst, tcp_sport, tcp_dport)] = self.ft[(ip_src, ip_dst, tcp_sport, tcp_dport)] + (lenip - 4 * tcp.dataofs)
             #
             # write your code here
             #
